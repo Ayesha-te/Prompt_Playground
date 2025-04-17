@@ -1,8 +1,8 @@
 import streamlit as st
-import together
+from together import Together
 
-# Load API key
-together.api_key = st.secrets["togetherai_api_key"]
+# Initialize the Together client
+client = Together(api_key=st.secrets["togetherai_api_key"])
 
 st.title("🧠 Prompt Engineering Playground")
 
@@ -10,12 +10,12 @@ user_prompt = st.text_area("📝 Enter your prompt:")
 if st.button("Submit"):
     if user_prompt:
         try:
-            response = together.Complete.create(
-                model="togethercomputer/llama-2-7b-chat",  # You can change this
+            response = client.completions.create(
+                model="mistralai/Mistral-7B-Instruct-v0.1",  # ✅ Serverless-compatible model
                 prompt=user_prompt,
                 max_tokens=150
             )
-            reply = response['output']['choices'][0]['text']
+            reply = response.choices[0].text
             st.markdown("### 🤖 Response:")
             st.write(reply)
         except Exception as e:

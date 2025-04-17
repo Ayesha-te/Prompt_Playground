@@ -79,4 +79,3 @@ if st.button("🚀 Generate Response") and final_prompt:
         st.error(f"❌ Error generating response: {e}")
 else:
     st.info("💡 Enter a prompt and click 'Generate Response' to get started.")
-``

@@ -4,15 +4,15 @@ from together import Together
 # Load API key from Streamlit secrets
 client = Together(api_key=st.secrets["togetherai_api_key"])
 
-st.set_page_config(page_title="Prompt Engineering Playground", layout="wide")
-st.title("Prompt Engineering Playground")
-st.write("Explore different prompt engineering techniques and styles.")
+st.set_page_config(page_title="✨ Prompt Engineering Playground", layout="wide")
+st.title("🧠 Prompt Engineering Playground")
+st.write("🔍 Explore different prompt engineering techniques and styles using Together AI.")
 
 # User input
-base_prompt = st.text_input("Enter a question or topic:", "")
+base_prompt = st.text_input("📝 Enter a question or topic:", "")
 
 # Model selection
-model = st.selectbox("Choose a model", [
+model = st.selectbox("🤖 Choose a model", [
     "mistralai/Mistral-7B-Instruct-v0.1",
     "meta-llama/Llama-2-7b-chat-hf",
     "togethercomputer/CodeLlama-7b-Instruct",
@@ -20,7 +20,7 @@ model = st.selectbox("Choose a model", [
 ])
 
 # Technique selection
-technique = st.selectbox("Prompting Technique", [
+technique = st.selectbox("🧪 Prompting Technique", [
     "Zero-Shot",
     "Few-Shot",
     "Chain-of-Thought",
@@ -29,12 +29,12 @@ technique = st.selectbox("Prompting Technique", [
 ])
 
 # Max Tokens
-max_tokens = st.slider("Max Tokens", 50, 300, 150)
+max_tokens = st.slider("🔢 Max Tokens", 50, 300, 150)
 
 # Temperature
-temperature = st.slider("Temperature (creativity)", 0.0, 1.5, 0.7, 0.1)
+temperature = st.slider("🌡️ Temperature (creativity)", 0.0, 1.5, 0.7, 0.1)
 
-# Define examples and templates
+# Prompt templates
 few_shot_examples = (
     "Q: What are the benefits of drinking water?\n"
     "A: Water helps maintain bodily fluids, improves skin health, and boosts energy.\n\n"
@@ -64,7 +64,7 @@ else:
     final_prompt = ""
 
 # Generate button
-if st.button("Generate Response") and final_prompt:
+if st.button("🚀 Generate Response") and final_prompt:
     try:
         response = client.chat.completions.create(
             model=model,
@@ -73,9 +73,10 @@ if st.button("Generate Response") and final_prompt:
             temperature=temperature
         )
         output = response.choices[0].message.content.strip()
-        st.markdown("### Model Response")
+        st.markdown("### 📤 Model Response")
         st.write(output)
     except Exception as e:
-        st.error(f"Error generating response: {e}")
+        st.error(f"❌ Error generating response: {e}")
 else:
-    st.info("Enter a prompt and click Generate Response.")
+    st.info("💡 Enter a prompt and click 'Generate Response' to get started.")
+``

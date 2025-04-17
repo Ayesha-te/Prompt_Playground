@@ -1,70 +1,81 @@
 import streamlit as st
 from together import Together
 
-# Initialize Together AI client
+# Load API key from Streamlit secrets
 client = Together(api_key=st.secrets["togetherai_api_key"])
 
-st.set_page_config(page_title="Prompt Style Comparison", layout="wide")
-st.title("Prompt Style Comparison Playground")
-st.write("Enter a base topic or question, and we'll show how different prompt styles and techniques affect the response.")
+st.set_page_config(page_title="Prompt Engineering Playground", layout="wide")
+st.title("Prompt Engineering Playground")
+st.write("Explore different prompt engineering techniques and styles.")
 
 # User input
-base_prompt = st.text_input("Base prompt/topic (e.g. 'benefits of drinking water')", "")
+base_prompt = st.text_input("Enter a question or topic:", "")
 
-# Choose model
-model = st.selectbox("Choose model", [
+# Model selection
+model = st.selectbox("Choose a model", [
     "mistralai/Mistral-7B-Instruct-v0.1",
     "meta-llama/Llama-2-7b-chat-hf",
     "togethercomputer/CodeLlama-7b-Instruct",
     "togethercomputer/RedPajama-INCITE-Chat-3B-v1"
 ])
 
-# Choose prompting technique
-technique = st.selectbox("Select Prompting Technique", ["Zero-Shot", "Few-Shot"])
+# Technique selection
+technique = st.selectbox("Prompting Technique", [
+    "Zero-Shot",
+    "Few-Shot",
+    "Chain-of-Thought",
+    "Instruction",
+    "Role Prompting"
+])
 
-# Max tokens
+# Max Tokens
 max_tokens = st.slider("Max Tokens", 50, 300, 150)
 
-# Define few-shot examples
+# Temperature
+temperature = st.slider("Temperature (creativity)", 0.0, 1.5, 0.7, 0.1)
+
+# Define examples and templates
 few_shot_examples = (
     "Q: What are the benefits of drinking water?\n"
-    "A: Drinking water helps maintain body fluids, energizes muscles, and improves skin.\n\n"
-    "Q: How does exercise benefit mental health?\n"
-    "A: Exercise reduces stress and anxiety by releasing endorphins and improving sleep.\n\n"
+    "A: Water helps maintain bodily fluids, improves skin health, and boosts energy.\n\n"
+    "Q: Why is exercise important?\n"
+    "A: It helps reduce stress, increases stamina, and improves overall well-being.\n\n"
 )
 
-# Generate button
-if st.button("Generate & Compare") and base_prompt:
+role_description = "You are a helpful and knowledgeable science teacher.\n"
+instruction_format = "Provide a clear and concise explanation of the following:\n"
+cot_suffix = " Let's think step by step."
 
-    styles = {
-        "Direct": f"{base_prompt}",
-        "Instructive": f"Explain in detail: {base_prompt}",
-        "Conversational": f"Human: Can you tell me about {base_prompt}?\nAI:",
-        "Academic": f"Write a short academic explanation on the topic: {base_prompt}",
-        "Simplified": f"Explain {base_prompt} like I’m five years old.",
-    }
-
-    cols = st.columns(len(styles))
-
-    for i, (style_name, prompt) in enumerate(styles.items()):
-        with cols[i]:
-            st.markdown(f"### {style_name}")
-            try:
-                if technique == "Few-Shot":
-                    full_prompt = f"{few_shot_examples}Q: {prompt}\nA:"
-                else:
-                    full_prompt = prompt
-
-                response = client.completions.create(
-                    model=model,
-                    prompt=full_prompt,
-                    max_tokens=max_tokens,
-                )
-
-                output = response.choices[0].text.strip()
-                st.write(output)
-            except Exception as e:
-                st.error(f"Error: {e}")
-
+# Build final prompt
+if base_prompt:
+    if technique == "Zero-Shot":
+        final_prompt = base_prompt
+    elif technique == "Few-Shot":
+        final_prompt = f"{few_shot_examples}Q: {base_prompt}\nA:"
+    elif technique == "Chain-of-Thought":
+        final_prompt = f"{base_prompt}{cot_suffix}"
+    elif technique == "Instruction":
+        final_prompt = f"{instruction_format}{base_prompt}"
+    elif technique == "Role Prompting":
+        final_prompt = f"{role_description}Answer the question: {base_prompt}"
+    else:
+        final_prompt = base_prompt
 else:
-    st.info("Enter a prompt and click 'Generate & Compare' to get started.")
+    final_prompt = ""
+
+# Generate button
+if st.button("Generate Response") and final_prompt:
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": final_prompt}],
+            max_tokens=max_tokens,
+            temperature=temperature
+        )
+        output = response.choices[0].message.content.strip()
+        st.markdown("### Model Response")
+        st.write(output)
+    except Exception as e:
+        st.error(f"Error generating response: {e}")
+else:
+    st.info("Enter a prompt and click Generate Response.")

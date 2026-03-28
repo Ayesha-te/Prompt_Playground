@@ -1,8 +1,8 @@
 import streamlit as st
-from together import Together
+from openai import OpenAI
 
 
-client = Together(api_key=st.secrets["togetherai_api_key"])
+client = OpenAI(api_key=st.secrets["openai"]["openai_api_key"])
 
 
 st.set_page_config(page_title="Prompt Engineering Playground", layout="wide")
@@ -13,10 +13,10 @@ with st.sidebar:
     model = st.selectbox(
         "Choose a model",
         [
-            "mistralai/Mistral-7B-Instruct-v0.1",
-            "meta-llama/Llama-2-7b-chat-hf",
-            "togethercomputer/CodeLlama-7b-Instruct",
-            "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+            "gpt-4o-mini",
+            "gpt-4o",
+            "gpt-4.1-mini",
+            "gpt-4.1",
         ],
     )
 
@@ -38,7 +38,7 @@ with st.sidebar:
 st.title("Prompt Engineering Playground")
 st.markdown(
     "Explore prompt engineering techniques using "
-    "[Together AI](https://together.ai). Test different models and see "
+    "[OpenAI](https://openai.com). Test different models and see "
     "how prompting changes outcomes."
 )
 
@@ -95,5 +95,5 @@ else:
 
 st.markdown("---")
 st.markdown(
-    "Made with Streamlit and powered by Together AI."
+    "Made with Streamlit and powered by OpenAI."
 )
